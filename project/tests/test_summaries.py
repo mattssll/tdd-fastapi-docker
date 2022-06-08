@@ -3,11 +3,11 @@
 
 import json
 
-import pytest
-
 
 def test_post_summary(test_app_with_db):
-    response = test_app_with_db.post("/summaries/", data=json.dumps({"url": "https://foo.bar"}))
+    response = test_app_with_db.post(
+        "/summaries/", data=json.dumps({"url": "https://foo.bar"})
+    )
     assert response.status_code == 201
     assert response.json()["url"] == "https://foo.bar"
 
@@ -20,14 +20,16 @@ def test_post_summaries_invalid_json(test_app):
             {
                 "loc": ["body", "url"],
                 "msg": "field required",
-                "type": "value_error.missing"
+                "type": "value_error.missing",
             }
         ]
     }
 
 
 def test_get_summary(test_app_with_db):
-    response = test_app_with_db.post("/summaries/", data=json.dumps({"url": "https://foo.bar"}))
+    response = test_app_with_db.post(
+        "/summaries/", data=json.dumps({"url": "https://foo.bar"})
+    )
     summary_id = response.json()["id"]  # response from post request
 
     response = test_app_with_db.get(f"/summaries/{summary_id}/")
@@ -45,10 +47,15 @@ def test_get_summary_incorrect_id(test_app_with_db):
     assert response.status_code == 404
     assert response.json()["detail"] == "Summary not found"
 
+
 def test_get_all_summaries(test_app_with_db):
-    response_a = test_app_with_db.post("/summaries/", data=json.dumps({"url": "https://foo.bar"}))
+    response_a = test_app_with_db.post(
+        "/summaries/", data=json.dumps({"url": "https://foo.bar"})
+    )
     summary_id = response_a.json()["id"]
-    response_b = test_app_with_db.post("/summaries/", data=json.dumps({"url": "https://newfoo.bar"}))
+    response_b = test_app_with_db.post(
+        "/summaries/", data=json.dumps({"url": "https://newfoo.bar"})
+    )
     summary_id_b = response_b.json()
     response = test_app_with_db.get("/summaries/")
     assert response.status_code == 200

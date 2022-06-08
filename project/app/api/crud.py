@@ -1,10 +1,10 @@
 # project/app/api/crud.py
 
 
+from typing import List, Union
+
 from app.models.pydantic import SummaryPayloadSchema
 from app.models.tortoise import TextSummary
-
-from typing import Union, List
 
 
 async def get_all() -> List[TextSummary]:
@@ -12,7 +12,9 @@ async def get_all() -> List[TextSummary]:
     return summaries
 
 
-async def get(id: int) -> Union[dict, None]:  # returns dict dict or None, some as Optional
+async def get(
+    id: int,
+) -> Union[dict, None]:  # returns dict dict or None, some as Optional
     summary = await TextSummary.filter(id=id).first().values()
     if summary:
         return summary

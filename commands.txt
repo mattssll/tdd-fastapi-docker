@@ -44,28 +44,47 @@ docker-compose exec web python -m pytest -x --pdb  # enter PDB after first failu
 docker-compose exec web python -m pytest --maxfail=2  # stop the test run after two failures
 docker-compose exec web python -m pytest -l  # show local variables in tracebacks
 docker-compose exec web python -m pytest --durations=2  # list the 2 slowest tests
+# test with coverage
+docker-compose exec web python -m pytest --cov="."
+docker-compose exec web python -m pytest --cov="." --cov-report html
 
+# linting with flake8
+docker-compose exec web flake8 .
+
+# isort to sort our imports alphabetically and separate them into sections
+docker-compose exec web isort . --check-only
+docker-compose exec web isort . --diff
+docker-compose exec web isort .
+# code formatting with black, check how many files need formatting
+docker-compose exec web black . --check
+# check what would change
+$ docker-compose exec web black . --diff
+# do the actual formatting
+docker-compose exec web black .
 # Heroku deploy, create app:
 heroku create
 # log in to the Heroku Container Registry:
 heroku container:login
 # provision a new Postgres database with the hobby-dev plan:
-heroku addons:create heroku-postgresql:hobby-dev --app <app_name>
+heroku addons:create heroku-postgresql:hobby-dev --app thawing-ocean-75859
 # build the production image and tag it with the following format:
-registry.heroku.com/<app>/<process-type>  # web dyno, so process-type=web
-# example for the code above:
-docker build -f project/Dockerfile.prod -t registry.heroku.com/sleepy-thicket-77414/web ./project
+#docker build --platform linux/amd64 -f project/Dockerfile.prod -t registry.heroku.com/thawing-ocean-75859/web ./project
+docker buildx build --load --platform linux/amd64 -f project/Dockerfile.prod -t registry.heroku.com/thawing-ocean-75859/web ./project
 # spin container to test locally
-docker run --name fastapi-tdd -e PORT=8765 -e DATABASE_URL=sqlite://sqlite.db -p 5003:8765 registry.heroku.com/sleepy-thicket-77414/web:latest
+docker run --name fastapi-tdd -e PORT=8765 -e DATABASE_URL=sqlite://sqlite.db -p 5003:8765 registry.heroku.com/thawing-ocean-75859/web:latest
 # test in
 http://localhost:5003/ping/
 # once done bring container down
 docker rm fastapi-tdd -f
 # push the image to the registry:
-docker push registry.heroku.com/sleepy-thicket-77414/web:latest
-# release the image:
-heroku container:release web --app sleepy-thicket-77414 # this will run the container. You should be able to view the app at https://APP_NAME.herokuapp.com/ping/.
+# docker push registry.heroku.com/thawing-ocean-75859/web:latest
+docker push registry.heroku.com/thawing-ocean-75859/web:latest
+
+# release the image - this will run the container. You should be able to view the app at heroku logs --tail.
+heroku container:release web --app thawing-ocean-75859
 # apply migrations
-heroku run aerich upgrade --app sleepy-thicket-77414
+heroku run aerich upgrade --app thawing-ocean-75859
+# see heroku logs
+heroku logs --app=thawing-ocean-75859 --tail
 # testing post endpoint:
-http --json POST https://sleepy-thicket-77414.herokuapp.com/summaries/ url=https://testdriven.io
+http --json POST https://thawing-ocean-75859.herokuapp.com/summaries/ url=https://testdriven.io
