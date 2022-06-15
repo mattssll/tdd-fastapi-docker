@@ -25,7 +25,8 @@ docker-compose exec web aerich init-db
 aerich downgrade
 aerich history
 # to apply the migration (create tables in case they were deleted)
-aerich upgrade (docker-compose exec web aerich upgrade)
+aerich upgrade
+docker-compose exec web aerich upgrade
 
 # create tables with python instead of Aerich
 docker-compose exec web python app/db.py

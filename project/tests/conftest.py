@@ -30,7 +30,6 @@ def test_app():
 
         # testing
         yield test_client
-
     # tear down
 
 
@@ -49,3 +48,4 @@ def test_app_with_db():
     with TestClient(app) as test_client:
         # testing
         yield test_client
+    # tear down

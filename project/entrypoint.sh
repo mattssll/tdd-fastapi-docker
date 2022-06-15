@@ -8,4 +8,5 @@ done
 
 echo "PostgreSQL started"
 
+# The below takes the arguments from the terminal and run it here, $@ is only a passthrough
 exec "$@"
